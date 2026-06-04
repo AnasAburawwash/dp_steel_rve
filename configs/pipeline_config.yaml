@@ -1,0 +1,59 @@
+# pipeline_config.yaml
+# Master configuration for the DP800 CP parameter study pipeline.
+# All paths are resolved relative to base_dir.
+# Change environment: to "linux" when running on HPC — no code changes needed.
+
+# ── Execution environment ──────────────────────────────────────────────────
+environment: wsl          # options: wsl | linux | windows
+                          # Override via env variable: export DP_STEEL_ENV=linux
+
+# ── Paths ─────────────────────────────────────────────────────────────────
+base_dir:  "/mnt/c/Study/PhD/rve_simulations"                     # root simulation folder
+data_dir:  "/mnt/c/Study/PhD/rve_simulations/data"               # LHS dataset .data and .csv files
+log_dir:   "/mnt/c/Study/PhD/rve_simulations/logs"               # rotating log files
+
+# ── Dataset / LHS ─────────────────────────────────────────────────────────
+seed:      42
+n_samples: 20      # single master dataset (N=1000)
+                   # learning-curve subsampling is handled in the AI pipeline
+
+# ── Neper tessellation ────────────────────────────────────────────────────
+neper:
+  executable:    "neper"
+  dim: 2                     # 2D or 3D RVE
+  n_grains_ferr: 100         # Number of ferrite grains.
+  n_grains_mart: 20          # Number of martensite grains.
+  rve_length_um: 640         # cubic RVE edge length in µm
+  n_workers:     1           # parallel Neper processes
+  timeout_s:                 # per-sample timeout (seconds)
+
+# ── Neper visualization ───────────────────────────────────────────────────
+visualization:
+  enabled:       true
+  auto_n:        5          # auto-render first N samples
+  sample_ids:    []         # additional specific sample IDs to render
+  render_diameq: true       # grain size colour map
+  render_ipf:    false      # IPF orientation map (slower)
+
+# ── DAMASK simulation ──────────────────────────────────────────────────────
+damask:
+  executable:    "DAMASK_grid"
+  rve_size_m:    [25.0e-6, 25.0e-6, 25.0e-6]   # physical RVE size in metres
+  n_threads:     4          # OMP_NUM_THREADS per DAMASK call
+  n_workers:     1          # parallel DAMASK instances (keep 1 on a shared node)
+  timeout_s:     3600       # per-sample timeout (1 hour)
+
+# ── Logging ───────────────────────────────────────────────────────────────
+logging:
+  level: INFO               # DEBUG | INFO | WARNING | ERROR
+
+# ── HPC (stub — fill in when cluster access is available) ─────────────────
+# hpc:
+#   scheduler:     slurm       # slurm | pbs
+#   partition:     compute
+#   account:       myproject
+#   time_limit:    "02:00:00"
+#   nodes:         1
+#   cpus_per_task: 8
+#   mem_gb:        32
+#   modules:       ["neper/4.10", "damask/3.0.0", "anaconda3"]
