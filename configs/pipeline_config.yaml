@@ -21,11 +21,11 @@ n_samples: 20      # single master dataset (N=1000)
 neper:
   executable:    "neper"
   dim: 2                     # 2D or 3D RVE
-  n_grains_ferr: 100         # Number of ferrite grains.
-  n_grains_mart: 20          # Number of martensite grains.
-  rve_length_um: 640         # cubic RVE edge length in µm
-  n_workers:     1           # parallel Neper processes
-  timeout_s:                 # per-sample timeout (seconds)
+  n_grains_ferr: 320         # Number of ferrite grains.
+  n_grains_mart: 80          # Number of martensite grains.
+  rve_length_um: 100         # cubic RVE edge length in µm
+  n_workers:     12          # parallel Neper processes
+  timeout_s:     900         # per-sample timeout (seconds)
 
 # ── Neper visualization ───────────────────────────────────────────────────
 visualization:

@@ -150,7 +150,7 @@ FERRITE_PARAMETERS: list[ParameterSchema] = [
         latex_symbol=r"\bar{d}^{\mathrm{ferr}}",
         damask_key=None,
         phase="Ferrite",
-        reference=5.0, min_val=2.0, max_val=15.0,
+        reference=5.0, min_val=1.0, max_val=16.0,
         unit="µm", distribution="log", role="independent", param_type="length",
         notes="Sampled ferrite equivalent grain-size mean passed to Neper.",
     ),

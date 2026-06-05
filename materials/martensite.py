@@ -140,7 +140,7 @@ MARTENSITE_PARAMETERS: list[ParameterSchema] = [
         latex_symbol=r"\bar{d}^{\mathrm{mart}}",
         damask_key=None,
         phase="Martensite",
-        reference=3.0, min_val=1.0, max_val=8.0,
+        reference=0.3, min_val=0.1, max_val=6.0,
         unit="µm", distribution="log", role="independent", param_type="length",
     ),
     

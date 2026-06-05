@@ -104,7 +104,7 @@ class TessellationConfig:
     rve_size_um:      float = 30.0
     n_grains_ferr:    int   = 100
     n_grains_mart:    int   = 50
-    grid_resolution:  int   = 32
+    grid_resolution:  int   = 64
     reg:              int   = 1
     neper_executable: str   = "neper"
     timeout_s:        int   = 600
@@ -162,8 +162,8 @@ def run_tessellation(
     # Normalised mean = mean_µm / L.
     # The lognormal σ parameter is scale-invariant (it is the std of log(d)).
     L = cfg.rve_size_um
-    ferr_mu_norm, ferr_sigma_ln = _to_lognormal_params(ferr_d_mean, ferr_d_std, L)
-    mart_mu_norm, mart_sigma_ln = _to_lognormal_params(mart_d_mean, mart_d_std, L)
+    ferr_mean_norm, ferr_std_norm = _to_neper_lognormal_normalised( ferr_d_mean, ferr_d_std, L)
+    mart_mean_norm, mart_std_norm = _to_neper_lognormal_normalised(mart_d_mean, mart_d_std, L)
 
     # ── Total grain count ─────────────────────────────────────────────────────
     n_total = cfg.n_grains_ferr + cfg.n_grains_mart
@@ -187,8 +187,8 @@ def run_tessellation(
     #   + (1-ferr_vf) * lognormal(mu_mart, sigma_mart)
     # Neper supports this with the "+" operator in -morpho.
     morpho = (
-        f"diameq:{ferr_vf:.4f}*lognormal({ferr_mu_norm:.5f},{ferr_sigma_ln:.5f})"
-        f"+{(1-ferr_vf):.4f}*lognormal({mart_mu_norm:.5f},{mart_sigma_ln:.5f}),"
+        f"diameq:{ferr_vf:.4f}*lognormal({ferr_mean_norm:.5f},{ferr_std_norm:.5f})"
+        f"+{(1-ferr_vf):.4f}*lognormal({mart_mean_norm:.5f},{mart_std_norm:.5f}),"
         f"1-sphericity:lognormal(0.145,0.03)"
     )
 
@@ -197,10 +197,12 @@ def run_tessellation(
 
     if dim == 2:
         domain = f"square({L:.4f},{L:.4f})"
-        statcell = "diameq,area,ori"
+        # statcell = "diameq,area,ori"
+        statcell = "diameq,area"
     elif dim == 3:
         domain = f"cube({L:.4f},{L:.4f},{L:.4f})"
-        statcell = "diameq,vol,ori"
+        # statcell = "diameq,area,ori"
+        statcell = "diameq,area"
     else:
         raise ValueError(f"Unsupported Neper dimension: {dim}. Use 2 or 3.")
 
@@ -214,10 +216,10 @@ def run_tessellation(
         "-id",          str(sample_id + 1),          # neper -id is 1-indexed
         "-domain",      domain,
         "-morpho",      morpho,
-        "-group",       f"vol<{v_thresh}?1:2",
-        "-crysym",      "cI",                        # BCC cubic symmetry
-        "-ori",         "random",                    # uniform random texture
-        "-orisampling", "uniform",                   # space-filling in SO(3)
+        "-group",       "mode",
+        # "-crysym",      "cI",                        # BCC cubic symmetry
+        # "-ori",         "random",                    # uniform random texture
+        # "-orisampling", "uniform",                   # space-filling in SO(3) #later in 3D
         "-reg",         str(cfg.reg),
         "-o",           out_stem,
         "-format",      "tess,tesr",
@@ -342,6 +344,14 @@ def _to_lognormal_params(
     sigma_ln = math.sqrt(math.log(1 + cv ** 2))
     mu_norm  = mean_um / rve_size_um
     return mu_norm, sigma_ln
+
+def _to_neper_lognormal_normalised(
+    mean_um: float, std_um: float, rve_size_um: float
+) -> tuple[float, float]:
+    """Return (mean_norm, std_norm) for diameq:lognormal(mean_norm,std_norm)."""
+    mean_norm = mean_um / rve_size_um
+    std_norm  = std_um / rve_size_um
+    return mean_norm, std_norm
 
 
 def _parse_realised_vf(stcell_path: Path) -> Optional[float]:
