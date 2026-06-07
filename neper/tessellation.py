@@ -104,7 +104,7 @@ class TessellationConfig:
     rve_size_um:      float = 30.0
     n_grains_ferr:    int   = 100
     n_grains_mart:    int   = 50
-    grid_resolution:  int   = 64
+    grid_resolution:  int   = 128
     reg:              int   = 1
     neper_executable: str   = "neper"
     timeout_s:        int   = 600
@@ -222,7 +222,7 @@ def run_tessellation(
         # "-orisampling", "uniform",                   # space-filling in SO(3) #later in 3D
         "-reg",         str(cfg.reg),
         "-o",           out_stem,
-        "-format",      "tess,tesr",
+        "-format",      "tess,tesr,vtk",
         "-tesrsize",    str(cfg.grid_resolution),
         "-statcell",    statcell,                    # write .stcell for QC
     ]
