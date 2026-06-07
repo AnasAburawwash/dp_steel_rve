@@ -9,13 +9,13 @@ This module centralizes:
 - construction of h_sl-sl through interaction_matrix.build_h_sl_sl().
 
 A complete material configuration file contains 'phase', 'material', and
-'homogenization' sections in DAMASK [web:133].
+'homogenization' sections in DAMASK.
 """
 
 from dataclasses import dataclass
 from copy import deepcopy
 
-from damask.interaction_matrix import build_h_sl_sl
+from damask_utils.interaction_matrix import build_h_sl_sl
 
 
 def phase_yaml_base() -> dict:
@@ -62,14 +62,18 @@ class PhaseConfig:
     def to_yaml_dict(self) -> dict:
         data = deepcopy(phase_yaml_base())
 
-        data['mechanical']['elastic']['C_11'] = self._gpa_to_pa('C11')
-        data['mechanical']['elastic']['C_12'] = self._gpa_to_pa('C12')
-        data['mechanical']['elastic']['C_44'] = self._gpa_to_pa('C44')
+        data['mechanical']['elastic']['C_11'] = self._mpa_to_pa('C11')
+        data['mechanical']['elastic']['C_12'] = self._mpa_to_pa('C12')
+        data['mechanical']['elastic']['C_44'] = self._mpa_to_pa('C44')
 
         data['mechanical']['plastic']['n_sl'] = self._value('n_sl')
         data['mechanical']['plastic']['a_sl'] = self._value('a_sl')
-        data['mechanical']['plastic']['dot_gamma_0_sl'] = self._value('dot_gamma_0_sl')
-        data['mechanical']['plastic']['h_0_sl-sl'] = self._mpa_to_pa('h_0')
+        
+        dot_gamma = self._value('dot_gamma_0_sl')
+        data['mechanical']['plastic']['dot_gamma_0_sl'] = [dot_gamma, dot_gamma]
+        
+        data['mechanical']['plastic']['h_0_sl-sl'] = self._mpa_to_pa('h0_sl')
+        
         data['mechanical']['plastic']['xi_0_sl'] = [
             self._mpa_to_pa('xi_0_sl_1'),
             self._mpa_to_pa('xi_0_sl_2'),
@@ -78,8 +82,7 @@ class PhaseConfig:
             self._mpa_to_pa('xi_inf_sl_1'),
             self._mpa_to_pa('xi_inf_sl_2'),
         ]
-        data['mechanical']['plastic']['h_sl-sl'] = build_h_sl_sl(
-            self._value('h_sl_sl_aa'),
-            self._value('h_sl_sl_ab'),
-        )
+        data['mechanical']['plastic']['h_sl-sl'] = build_h_sl_sl(1.0, 1.4)  # TODO: hardcoded for now, should be added as fixed parameters within material parameters
+            # self._value('h_sl_sl_aa'),
+            # self._value('h_sl_sl_ab'),
         return data

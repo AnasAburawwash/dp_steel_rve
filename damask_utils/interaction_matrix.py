@@ -15,7 +15,7 @@ This module keeps the mapping explicit and testable.
 
 from dataclasses import dataclass
 
-SELF_INDICES_24 = {0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22}
+SELF_INDICES_24 = {0, 2}
 VECTOR_LENGTH = 24
 
 

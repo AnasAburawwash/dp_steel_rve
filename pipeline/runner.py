@@ -38,7 +38,6 @@ def run_pipeline_for_n(
     data_dir:          str | Path,
     all_params:        list,
     cfg:               dict,          # parsed pipeline_config.yaml
-    damask_module,                    # imported damask — injected to avoid hard dep
     stage:             str  = "all",  # "neper" | "damask" | "all"
     dry_run:           bool = False,
     retry_failed:      bool = False,
@@ -121,7 +120,6 @@ def run_pipeline_for_n(
             dataset_dir        = dataset_dir,
             state              = state,
             rve_size_m         = rve_size_m,
-            damask_module      = damask_module,
             damask_executable  = d_cfg.get("executable", "DAMASK_grid"),
             n_threads          = d_cfg.get("n_threads", 4),
             n_workers          = d_cfg.get("n_workers", 1),

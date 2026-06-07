@@ -63,7 +63,7 @@ FERRITE_PARAMETERS: list[ParameterSchema] = [
 
     # ── Kinetic law ───────────────────────────────────────────────────────────
     ParameterSchema(
-        name="ferr_dot_gamma_0",
+        name="ferr_dot_gamma_0_sl",
         physical_name="Reference shear rate γ̇₀ (Ferrite)",
         latex_symbol=r"\dot{\gamma}_0^{\mathrm{ferr}}",
         damask_key="dot_gamma_0_sl",
@@ -182,7 +182,7 @@ FERRITE_PARAMETERS: list[ParameterSchema] = [
         latex_symbol=r"f^{\mathrm{ferr}}",
         damask_key="v",
         phase="Ferrite",
-        reference=0.82, min_val=0.45, max_val=0.90,
+        reference=0.82, min_val=0.50, max_val=0.98,
         unit="-", distribution="uniform", role="independent", param_type="ratio",
     ),
 ]

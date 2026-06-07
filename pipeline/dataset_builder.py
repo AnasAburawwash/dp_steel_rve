@@ -26,33 +26,17 @@ log = get_logger(__name__)
 
 
 def build_dataset(
-    n_samples:    int,
-    data_dir:     str | Path,
-    all_params:   list,        # list[ParameterSchema] — ALL_PARAMETERS from materials/
-    seed:         int  = 42,
-    force_regen:  bool = False,
-    export_csv:   bool = True,
+    n_samples: int,
+    data_dir: str | Path,
+    all_params: list,        # ALL_PARAMETERS
+    seed: int = 42,
+    force_regen: bool = False,
+    export_csv: bool = True,
 ) -> pd.DataFrame:
-    """
-    Load or generate the LHS dataset for n_samples.
-
-    Parameters
-    ----------
-    n_samples   : int
-    data_dir    : Path — folder to read/write dataset files
-    all_params  : list[ParameterSchema] — full parameter list
-    seed        : int  — LHS seed (passed through to LHSSampler)
-    force_regen : bool — ignore existing file and regenerate
-    export_csv  : bool — also write a human-readable CSV
-
-    Returns
-    -------
-    pd.DataFrame  shape (n_samples, n_parameters)
-    """
-    data_dir  = Path(data_dir)
+    data_dir = Path(data_dir)
     data_dir.mkdir(parents=True, exist_ok=True)
-    pkl_path  = data_dir / f"dataset_{n_samples}.data"
-    csv_path  = data_dir / f"dataset_{n_samples}.csv"
+    pkl_path = data_dir / f"dataset_{n_samples}.data"
+    csv_path = data_dir / f"dataset_{n_samples}.csv"
 
     if pkl_path.exists() and not force_regen:
         log.info("Loading existing dataset: %s", pkl_path)
@@ -62,9 +46,21 @@ def build_dataset(
     log.info("Generating LHS dataset  N=%d  seed=%d", n_samples, seed)
 
     from sampling.lhs_sampler import LHSSampler
-    sampled = [p for p in all_params if p.role == "independent"]
+
+    sampled = [p for p in all_params if p.role in {"independent", "loading"}]
+    fixed   = [p for p in all_params if p.role == "fixed"]
+
     sampler = LHSSampler(sampled, seed=seed)
     dataset = sampler.sample(n=n_samples)
+
+    # Add fixed parameters as constant columns
+    for p in fixed:
+        value = p.reference
+        dataset[p.name] = value
+
+    # Optional: enforce canonical column order from materials/__init__.py
+    canonical_order = [p.name for p in all_params]
+    dataset = dataset.reindex(columns=canonical_order)
 
     with pkl_path.open("wb") as f:
         pickle.dump(dataset, f, protocol=pickle.HIGHEST_PROTOCOL)

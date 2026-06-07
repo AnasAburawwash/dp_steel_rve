@@ -11,14 +11,15 @@ Workflow
 5. Add one material entry per grain in grain-id order.
 
 DAMASK material configurations contain 'phase', 'homogenization', and 'material'
-sections, and ConfigMaterial.material_add() appends a material entry [web:133][web:118].
+sections, and ConfigMaterial.material_add() appends a material entry.
 """
 
 from pathlib import Path
 import yaml
+import damask
 
-from damask.phase_config import PhaseConfig
-from damask.tess_reader import parse_tess
+from damask_utils.phase_config import PhaseConfig
+from damask_utils.tess_reader import parse_tess
 
 
 HOMOGENIZATION_BLOCK = {
@@ -46,7 +47,7 @@ def write_phase_yamls(sample_row, sample_dir: str | Path) -> dict:
     return {'Ferrite': ferr_path, 'Martensite': mart_path}
 
 
-def write_material_yaml(sample_row, sample_dir: str | Path, damask_module) -> Path:
+def write_material_yaml(sample_row, sample_dir: str | Path) -> Path:
     sample_dir = Path(sample_dir)
     phase_paths = write_phase_yamls(sample_row, sample_dir)
 
@@ -58,16 +59,16 @@ def write_material_yaml(sample_row, sample_dir: str | Path, damask_module) -> Pa
         tess_file = candidates[0]
 
     tess = parse_tess(tess_file)
-    rotations = damask_module.Rotation.from_Rodrigues_vector(
+    rotations = damask.Rotation.from_Rodrigues_vector(
         tess.rodrigues_damask,
         normalize=True,
         P=-1,
     )
 
-    cfg = damask_module.ConfigMaterial()
+    cfg = damask.ConfigMaterial()
     cfg['homogenization'] = HOMOGENIZATION_BLOCK
-    cfg['phase']['Ferrite'] = damask_module.ConfigMaterial.load(str(phase_paths['Ferrite']))
-    cfg['phase']['Martensite'] = damask_module.ConfigMaterial.load(str(phase_paths['Martensite']))
+    cfg['phase']['Ferrite'] = damask.ConfigMaterial.load(str(phase_paths['Ferrite']))
+    cfg['phase']['Martensite'] = damask.ConfigMaterial.load(str(phase_paths['Martensite']))
 
     for idx, phase_id in enumerate(tess.phase_idxs):
         phase_name = 'Ferrite' if phase_id == 1 else 'Martensite'

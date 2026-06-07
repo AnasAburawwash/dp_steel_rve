@@ -21,26 +21,26 @@ n_samples: 20      # single master dataset (N=1000)
 neper:
   executable:    "neper"
   dim: 2                     # 2D or 3D RVE
-  n_grains_ferr: 320         # Number of ferrite grains.
-  n_grains_mart: 80          # Number of martensite grains.
-  rve_length_um: 100         # cubic RVE edge length in µm
+  n_grains_ferr: 98          # Number of ferrite grains.
+  n_grains_mart: 22          # Number of martensite grains.
+  rve_length_um: 50          # cubic RVE edge length in µm
   n_workers:     12          # parallel Neper processes
-  timeout_s:     900         # per-sample timeout (seconds)
+  timeout_s:     360         # per-sample timeout (seconds)
 
 # ── Neper visualization ───────────────────────────────────────────────────
 visualization:
   enabled:       true
   auto_n:        5          # auto-render first N samples
   sample_ids:    []         # additional specific sample IDs to render
-  render_diameq: true       # grain size colour map
+  render_diameq: false       # grain size colour map
   render_ipf:    false      # IPF orientation map (slower)
 
 # ── DAMASK simulation ──────────────────────────────────────────────────────
 damask:
   executable:    "DAMASK_grid"
-  rve_size_m:    [25.0e-6, 25.0e-6, 25.0e-6]   # physical RVE size in metres
+  rve_size_m:    [50.0e-6, 50.0e-6, 1]   # physical RVE size in metres
   n_threads:     4          # OMP_NUM_THREADS per DAMASK call
-  n_workers:     1          # parallel DAMASK instances (keep 1 on a shared node)
+  n_workers:     4          # parallel DAMASK instances (keep 1 on a shared node)
   timeout_s:     3600       # per-sample timeout (1 hour)
 
 # ── Logging ───────────────────────────────────────────────────────────────

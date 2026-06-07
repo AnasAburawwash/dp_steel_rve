@@ -33,9 +33,9 @@ import argparse
 import os
 import sys
 from pathlib import Path
+import importlib.metadata
 
 import yaml
-import os
 env = os.environ.copy()
 env['OMP_NUM_THREADS'] = "1"
 
@@ -104,12 +104,14 @@ def main() -> None:
     from materials import ALL_PARAMETERS
 
     # ── DAMASK import (lazy — allows pipeline to start without DAMASK) ─────
-    damask_module = None
     if args.stage in ("all", "damask") and not args.dry_run:
         try:
-            import damask as _damask
-            damask_module = _damask
-            log.info("DAMASK version: %s", getattr(_damask, "__version__", "unknown"))
+            import damask
+            try:
+                damask_version = importlib.metadata.version("damask")
+            except importlib.metadata.PackageNotFoundError:
+                damask_version = "unknown"
+            log.info("DAMASK version: %s", damask_version)
         except ImportError:
             log.error("DAMASK Python package not found. Install it or use --dry-run.")
             sys.exit(1)
@@ -133,7 +135,6 @@ def main() -> None:
                 data_dir     = data_dir,
                 all_params   = ALL_PARAMETERS,
                 cfg          = cfg,
-                damask_module= damask_module,
                 stage        = args.stage,
                 dry_run      = args.dry_run,
                 retry_failed = args.retry_failed,

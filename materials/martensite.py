@@ -55,7 +55,7 @@ MARTENSITE_PARAMETERS: list[ParameterSchema] = [
 
     # ── Kinetic law ───────────────────────────────────────────────────────────
     ParameterSchema(
-        name="mart_dot_gamma_0",
+        name="mart_dot_gamma_0_sl",
         physical_name="Reference shear rate γ̇₀ (Martensite)",
         latex_symbol=r"\dot{\gamma}_0^{\mathrm{mart}}",
         damask_key="dot_gamma_0_sl",
@@ -173,7 +173,7 @@ MARTENSITE_PARAMETERS: list[ParameterSchema] = [
         latex_symbol=r"f^{\mathrm{mart}}",
         damask_key="v",
         phase="Martensite",
-        reference=0.18, min_val=0.10, max_val=0.55,
+        reference=0.18, min_val=0.02, max_val=0.50,
         unit="-", distribution="uniform", role="derived", param_type="ratio",
     ),
 ]

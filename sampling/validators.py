@@ -120,8 +120,8 @@ class PhysicalValidator:
             check_martensite_fraction(
                 df,
                 col="mart_vol_fract",
-                low=0.10,
-                high=0.55,
+                low=0.02,
+                high=0.50,
             )
 
         # 3) Ferrite cubic elastic stability

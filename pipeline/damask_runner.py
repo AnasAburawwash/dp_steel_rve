@@ -41,7 +41,6 @@ def run_damask_stage(
     dataset_dir:     str | Path,
     state:           StateManager,
     rve_size_m,                      # np.ndarray  shape (3,)
-    damask_module,                   # imported damask package
     damask_executable: str = "DAMASK_grid",
     n_threads:         int = 4,
     n_workers:         int = 1,
@@ -100,7 +99,6 @@ def run_damask_stage(
                 sample_row         = dataset.iloc[sid],
                 dataset_dir        = dataset_dir,
                 rve_size_m         = rve_size_m,
-                damask_module      = damask_module,
                 damask_executable  = damask_executable,
                 n_threads          = n_threads,
                 dry_run            = dry_run,
@@ -131,16 +129,15 @@ def _damask_worker(
     sample_row:       object,
     dataset_dir:      Path,
     rve_size_m,
-    damask_module,
     damask_executable: str,
     n_threads:         int,
     dry_run:           bool,
 ) -> str:
     """Single-sample DAMASK worker (runs in a subprocess)."""
-    from damask.grid_builder    import build_geom_from_neper
-    from damask.material_writer import write_material_yaml
-    from damask.load_writer     import write_load_yaml
-    from damask.solver          import run_solver
+    from damask_utils.grid_builder    import build_geom_from_neper
+    from damask_utils.material_writer import write_material_yaml
+    from damask_utils.load_writer     import write_load_yaml
+    from damask_utils.solver          import run_solver
 
     sample_dir = dataset_dir / f"sample_{sample_id:04d}"
 
@@ -149,8 +146,8 @@ def _damask_worker(
         return "DONE"
 
     try:
-        build_geom_from_neper(sample_dir, damask_module, rve_size_m)
-        write_material_yaml(sample_row, sample_dir, damask_module)
+        build_geom_from_neper(sample_dir, rve_size_m)
+        write_material_yaml(sample_row, sample_dir)
         write_load_yaml(sample_row, sample_dir)
         run_solver(
             sample_dir  = sample_dir,
