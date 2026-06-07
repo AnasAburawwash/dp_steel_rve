@@ -57,9 +57,12 @@ This repository follows semantic versioning:
 - `v0.2.x` new features
 - `v1.0.0` stable research-ready release
 
-## Environment
-Development is currently done in VS Code on WSL/Linux-style paths.
-The codebase is being structured so it can later be moved to HPC clusters with minimal changes.
+## Tested environment
+- Linux / WSL
+- Python 3.11.15
+- Neper 4.10.1
+- DAMASK 3.0.2
+- See requirements.txt for pinned Python packages
 
 ## License
 Add your chosen license here.
