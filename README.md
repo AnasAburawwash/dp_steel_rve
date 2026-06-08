@@ -4,8 +4,8 @@ Python package for generating and simulating dual-phase steel representative vol
 
 ## Status
 Current baseline:
-- Neper stage dry-run completed successfully
-- DAMASK stage integrated in the pipeline architecture
+- Neper stage completed successfully
+- DAMASK stage completed successfully
 - Repository is under active research development
 
 ## Purpose
@@ -14,7 +14,6 @@ Current baseline:
 - parameter sampling for dual-phase steels
 - Neper tessellation workflows
 - DAMASK CPFEM simulation setup
-- later AI-driven surrogate and FE² studies
 
 ## Project structure
 ```text
