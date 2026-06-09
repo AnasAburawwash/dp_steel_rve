@@ -115,6 +115,13 @@ class LHSSampler:
         """
         df = df.copy()
 
+        # Martensite mean grain size from ratio to ferrite
+        
+        if {"mart_grain_s_ratio_to_ferr", "ferr_grain_s_mean"}.issubset(df.columns):
+            df["mart_grain_s_mean"] = (
+                df["mart_grain_s_ratio_to_ferr"] * df["ferr_grain_s_mean"]
+            ).round(4)
+
         # Ferrite grain-size spread from sampled ratio
         if {"ferr_grain_s_mean", "ferr_grain_s_ratio"}.issubset(df.columns):
             df["ferr_grain_s_std"] = (

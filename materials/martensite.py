@@ -135,13 +135,38 @@ MARTENSITE_PARAMETERS: list[ParameterSchema] = [
 
     # ── Grain size ─────────────────────────────────────────────────────────────
     ParameterSchema(
+    name="mart_grain_s_ratio_to_ferr",
+    physical_name="Martensite-to-ferrite grain size ratio",
+    latex_symbol=r"r_{d}^{\mathrm{mart/ferr}}",
+    damask_key=None,
+    phase="Martensite",
+    reference=0.40,
+    min_val=0.30,   # 3-voxel floor: 3 × (50/128) / ferr_mean_ref ≈ 0.33 → use 0.35 safe margin
+    max_val=0.8,   # physically realistic for DP steel; avoid percolation > 1.5
+    unit="-",
+    distribution="log",   # ratio spans an order of magnitude → log is natural
+    role="independent",
+    param_type="ratio",
+    notes=(
+        "Ratio of martensite mean grain size to ferrite mean grain size. "
+        "Sampled in log space. Bounds enforce ≥3-voxel resolution on "
+        "128×128 grid / 50×50 µm domain."
+    ),
+    ),
+
+    ParameterSchema(
         name="mart_grain_s_mean",
         physical_name="Mean grain size (Martensite)",
         latex_symbol=r"\bar{d}^{\mathrm{mart}}",
         damask_key=None,
         phase="Martensite",
-        reference=0.3, min_val=0.1, max_val=6.0,
-        unit="µm", distribution="log", role="independent", param_type="length",
+        reference=0.3,
+        min_val=0.1, max_val=6.0,   # kept for schema validation only
+        unit="µm",
+        distribution="log",
+        role="derived",             
+        param_type="length",
+        notes="Derived as mart_grain_s_ratio_to_ferr × ferr_grain_s_mean.",
     ),
     
     ParameterSchema(
