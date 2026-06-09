@@ -182,7 +182,7 @@ FERRITE_PARAMETERS: list[ParameterSchema] = [
         latex_symbol=r"f^{\mathrm{ferr}}",
         damask_key="v",
         phase="Ferrite",
-        reference=0.82, min_val=0.50, max_val=0.98,
+        reference=0.82, min_val=0.50, max_val=0.92,
         unit="-", distribution="uniform", role="independent", param_type="ratio",
     ),
 ]

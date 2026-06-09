@@ -120,7 +120,7 @@ class PhysicalValidator:
             check_martensite_fraction(
                 df,
                 col="mart_vol_fract",
-                low=0.02,
+                low=0.08,
                 high=0.50,
             )
 

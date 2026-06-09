@@ -173,7 +173,7 @@ MARTENSITE_PARAMETERS: list[ParameterSchema] = [
         latex_symbol=r"f^{\mathrm{mart}}",
         damask_key="v",
         phase="Martensite",
-        reference=0.18, min_val=0.02, max_val=0.50,
+        reference=0.18, min_val=0.08, max_val=0.50,
         unit="-", distribution="uniform", role="derived", param_type="ratio",
     ),
 ]
