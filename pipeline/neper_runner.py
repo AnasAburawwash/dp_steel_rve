@@ -24,6 +24,7 @@ Resume and retry
 
 from __future__ import annotations
 
+import time
 import traceback
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
@@ -80,6 +81,8 @@ def run_neper_stage(
 
     results = {"done": 0, "failed": 0, "skipped": 0}
 
+    t0 = time.perf_counter()
+
     with ProcessPoolExecutor(max_workers=n_workers) as pool:
         futures = {
             pool.submit(
@@ -108,8 +111,12 @@ def run_neper_stage(
                 log.error("Neper worker raised for sample %04d: %s", sid, exc)
                 state.set_status(sid, "neper", "FAILED")
                 results["failed"] += 1
-
+    
+    elapsed = time.perf_counter() - t0
+    log.info("Neper stage wall time: %.2f s (%.2f min)", elapsed, elapsed / 60.0)
+    
     state.print_summary()
+    results["elapsed_s"] = elapsed
     return results
 
 
