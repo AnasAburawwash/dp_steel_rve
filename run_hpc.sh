@@ -23,7 +23,7 @@
 set -euo pipefail
 
 # ── Activate environment ─────────────────────────────────────
-module load python/anaconda3
+source "$HOME/miniconda3/etc/profile.d/conda.sh"
 conda activate micro_dpsteel
 
 # ── OpenMP / BLAS thread control ────────────────────────────
