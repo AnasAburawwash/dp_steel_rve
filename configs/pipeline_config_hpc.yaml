@@ -31,7 +31,7 @@ neper:
 
 # ── Neper visualization ────────────────────────────────────────────────────
 visualization:
-  enabled:       true
+  enabled:       false           # Disable visualization on HPC; set to true for local runs
   auto_n:        5
   sample_ids:    []
   render_diameq: false
