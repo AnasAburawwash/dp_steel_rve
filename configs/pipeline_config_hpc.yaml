@@ -1,0 +1,65 @@
+# pipeline_config_hpc.yaml
+# HPC-ready configuration for BatchXL on the Makalu cluster.
+# Derived from pipeline_config.yaml — only HPC-relevant values changed.
+# Usage:
+#   python main.py --config ./configs/pipeline_config_hpc.yaml --env linux
+
+# ── Execution environment ──────────────────────────────────────────────────
+environment: linux
+# Override via env variable:  export DP_STEEL_ENV=linux
+
+# ── Paths (use cluster scratch / home — no /mnt/c/ Windows paths) ─────────
+base_dir:  "/scratch/toso3816/rve_simulations"          # root simulation folder
+data_dir:  "/scratch/toso3816/rve_simulations/data"     # LHS .data / .csv files
+log_dir:   "/scratch/toso3816/rve_simulations/logs"     # rotating log files
+
+# ── Dataset / LHS ──────────────────────────────────────────────────────────
+seed:      42
+n_samples: 20     # start small; scale up once the job runs cleanly
+
+# ── Neper tessellation ─────────────────────────────────────────────────────
+neper:
+  executable:    "neper"
+  dim:           2               # 2D RVE
+  n_grains_ferr: 98
+  n_grains_mart: 22
+  rve_length_um: 50
+  n_workers:     8               # 8 parallel Neper processes on the node
+                                 # Each Neper call is single-threaded
+                                 # → 8 cores used during Neper stage
+  timeout_s:     600
+
+# ── Neper visualization ────────────────────────────────────────────────────
+visualization:
+  enabled:       true
+  auto_n:        5
+  sample_ids:    []
+  render_diameq: false
+  render_ipf:    false
+
+# ── DAMASK simulation ───────────────────────────────────────────────────────
+damask:
+  executable:    "DAMASK_grid"
+  rve_size_m:    [50.0e-6, 50.0e-6, 1]
+  n_threads:     4               # OMP_NUM_THREADS per DAMASK_grid call
+  n_workers:     2               # 2 concurrent DAMASK solver processes
+                                 # → 2 × 4 = 8 cores during DAMASK stage
+  timeout_s:     7200
+
+# ── Core budget check (informational) ──────────────────────────────────────
+# Neper  stage: n_workers        =  8  cores
+# DAMASK stage: n_workers × n_threads = 2 × 4 = 8  cores
+# → bsub -n 16 is the safe allocation for both stages combined
+
+# ── Logging ────────────────────────────────────────────────────────────────
+logging:
+  level: INFO
+
+# ── HPC ────────────────────────────────────────────────────────────────────
+hpc:
+  scheduler:     lsf
+  queue:         BatchXL
+  n_cores:       16             # bsub -n
+  time_limit:    "08:00"        # bsub -W  HH:MM
+  mem_gb:        32             # bsub -M  in MB below
+  job_name:      dp_rve_steel
