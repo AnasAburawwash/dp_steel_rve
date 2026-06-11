@@ -24,10 +24,10 @@ neper:
   n_grains_ferr: 98
   n_grains_mart: 22
   rve_length_um: 50
-  n_workers:     8               # 8 parallel Neper processes on the node
+  n_workers:     4               # 8 parallel Neper processes on the node
                                  # Each Neper call is single-threaded
                                  # → 8 cores used during Neper stage
-  timeout_s:     600
+  timeout_s:     
 
 # ── Neper visualization ────────────────────────────────────────────────────
 visualization:
@@ -44,7 +44,7 @@ damask:
   n_threads:     4               # OMP_NUM_THREADS per DAMASK_grid call
   n_workers:     2               # 2 concurrent DAMASK solver processes
                                  # → 2 × 4 = 8 cores during DAMASK stage
-  timeout_s:     7200
+  timeout_s:     
 
 # ── Core budget check (informational) ──────────────────────────────────────
 # Neper  stage: n_workers        =  8  cores
