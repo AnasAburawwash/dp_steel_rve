@@ -37,7 +37,7 @@ export MKL_NUM_THREADS=4       # keep BLAS libraries in line
 export OPENBLAS_NUM_THREADS=1  # prevent nested BLAS oversubscription
 
 # ── Project directory ────────────────────────────────────────
-PIPELINE_DIR="/home/toso3816/src/_/src"    # adjust to your repo location
+PIPELINE_DIR="/home/toso3816/src/dp_steel_rve"
 cd "${PIPELINE_DIR}"
 
 # ── Create log directory if missing ─────────────────────────
