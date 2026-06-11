@@ -36,8 +36,6 @@ from pathlib import Path
 import importlib.metadata
 
 import yaml
-env = os.environ.copy()
-env['OMP_NUM_THREADS'] = "1"
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
