@@ -156,10 +156,16 @@ def _damask_worker(
         build_geom_from_neper(sample_dir, rve_size_m)
         write_material_yaml(sample_row, sample_dir)
         write_load_yaml(sample_row, sample_dir)
-        run_solver(
+        solver_result = run_solver(
             sample_dir  = sample_dir,
             executable  = damask_executable,
             n_threads   = n_threads,
+        )
+        log.info(
+            "DAMASK solve complete  sample_id=%04d  elapsed=%.1fs  return_code=%d",
+            sample_id,
+            solver_result["elapsed_s"],
+            solver_result["return_code"],
         )
         return "DONE"
     except Exception:
