@@ -25,8 +25,6 @@ Resume and retry
 from __future__ import annotations
 
 import os
-os.environ["OMP_NUM_THREADS"] = "1"  # Neper uses OpenMP; limit to 1 thread per process to avoid oversubscription when running multiple processes in parallel.
-
 import time
 import traceback
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -133,6 +131,9 @@ def _neper_worker(
 ) -> str:
     """Single-sample Neper worker (runs in a subprocess)."""
     sample_dir = ensure_dir(dataset_dir / f"sample_{sample_id:04d}")
+    
+    os.environ["OMP_NUM_THREADS"] = "1"  # Neper uses OpenMP; limit to 1 thread per process to avoid oversubscription when running multiple processes in parallel.
+    
     try:
         tess_result = run_tessellation(
             sample_row = sample_row,
