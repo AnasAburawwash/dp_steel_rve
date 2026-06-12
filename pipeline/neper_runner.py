@@ -24,6 +24,9 @@ Resume and retry
 
 from __future__ import annotations
 
+import os
+os.environ["OMP_NUM_THREADS"] = "1"  # Neper uses OpenMP; limit to 1 thread per process to avoid oversubscription when running multiple processes in parallel.
+
 import time
 import traceback
 from concurrent.futures import ProcessPoolExecutor, as_completed
