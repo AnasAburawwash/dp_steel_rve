@@ -29,11 +29,11 @@ conda activate micro_dpsteel
 # ── OpenMP / BLAS thread control ────────────────────────────
 # n_workers=2, n_threads=4  →  2×4 = 8 solver threads
 # Must not exceed (bsub -n) = 16
-export OMP_NUM_THREADS=4       # matches damask.n_threads in config
+export OMP_NUM_THREADS=1       # matches damask.n_threads in config
 export OMP_PROC_BIND=spread    # pin threads to spread across cores
 export OMP_PLACES=cores        # thread placement unit = physical core
 export OMP_DYNAMIC=FALSE       # never let OpenMP change thread count silently
-export MKL_NUM_THREADS=4       # keep BLAS libraries in line
+export MKL_NUM_THREADS=1       # keep BLAS libraries in line
 export OPENBLAS_NUM_THREADS=1  # prevent nested BLAS oversubscription
 
 # ── Project directory ────────────────────────────────────────

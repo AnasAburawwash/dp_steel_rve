@@ -20,14 +20,14 @@ n_samples: 20     # start small; scale up once the job runs cleanly
 # ── Neper tessellation ─────────────────────────────────────────────────────
 neper:
   executable:    "neper"
-  dim:           2               # 2D RVE
+  dim:           2              # 2D RVE
   n_grains_ferr: 98
   n_grains_mart: 22
   rve_length_um: 50
-  n_workers:     4               # 8 parallel Neper processes on the node
-                                 # Each Neper call is single-threaded
-                                 # → 8 cores used during Neper stage
-  timeout_s:     
+  n_workers:     12             # 8 parallel Neper processes on the node
+                                # Each Neper call is single-threaded
+                                # → 8 cores used during Neper stage
+  timeout_s:     900            # 15 minutes per Neper call
 
 # ── Neper visualization ────────────────────────────────────────────────────
 visualization:
@@ -44,7 +44,7 @@ damask:
   n_threads:     4               # OMP_NUM_THREADS per DAMASK_grid call
   n_workers:     2               # 2 concurrent DAMASK solver processes
                                  # → 2 × 4 = 8 cores during DAMASK stage
-  timeout_s:     
+  timeout_s:     5400            # 1 hour per DAMASK call
 
 # ── Core budget check (informational) ──────────────────────────────────────
 # Neper  stage: n_workers        =  8  cores
