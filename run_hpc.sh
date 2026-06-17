@@ -13,7 +13,7 @@
 # ── LSF directives ──────────────────────────────────────────
 #BSUB -q BatchXL               # queue
 #BSUB -n 16                    # number of job slots (cores)
-#BSUB -W 08:00                 # wall-clock limit HH:MM
+#BSUB -W 12:00                 # wall-clock limit HH:MM
 #BSUB -M 32000                 # memory limit in MB (32 GB)
 #BSUB -J dp_rve_steel          # job name
 #BSUB -o logs/dp_rve_%J.out    # stdout  (%J = jobid)
@@ -21,6 +21,12 @@
 
 # ── Safety: abort on any error ──────────────────────────────
 set -euo pipefail
+# Ensure local GCC runtime & HDF5/FFTW libs are visible
+export LD_LIBRARY_PATH="$HOME/local/gcc-13.2.0/lib64:$HOME/local/gcc-13.2.0/lib:$HOME/local/hdf5-1.14.5-gcc13-ompi416/lib:$HOME/local/fftw-3.3.10-gcc13-ompi416/lib:${LD_LIBRARY_PATH:-}"
+# DAMASK grid install prefix
+export DAMASK_PREFIX="$HOME/local/damask-3.0.2"
+export PATH="$DAMASK_PREFIX/bin:$PATH"
+
 
 # ── Activate environment ─────────────────────────────────────
 source "$HOME/miniconda3/etc/profile.d/conda.sh"
@@ -29,12 +35,7 @@ conda activate micro_dpsteel
 # ── OpenMP / BLAS thread control ────────────────────────────
 # n_workers=2, n_threads=4  →  2×4 = 8 solver threads
 # Must not exceed (bsub -n) = 16
-export OMP_NUM_THREADS=1       # matches damask.n_threads in config
-export OMP_PROC_BIND=spread    # pin threads to spread across cores
-export OMP_PLACES=cores        # thread placement unit = physical core
-export OMP_DYNAMIC=FALSE       # never let OpenMP change thread count silently
-export MKL_NUM_THREADS=1       # keep BLAS libraries in line
-export OPENBLAS_NUM_THREADS=1  # prevent nested BLAS oversubscription
+export OMP_NUM_THREADS=4       # matches damask.n_threads in config #It speeds up damask's solver
 
 # ── Project directory ────────────────────────────────────────
 PIPELINE_DIR="/home/toso3816/src/dp_steel_rve"
