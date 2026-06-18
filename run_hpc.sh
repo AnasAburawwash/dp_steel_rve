@@ -57,6 +57,7 @@ echo "================"
 python main.py \
     --config ./configs/pipeline_config_hpc.yaml \
     --env    linux \
-    --stage  all
+    --stage  all \
+    --retry-failed
 
 echo "Pipeline finished: $(date)"

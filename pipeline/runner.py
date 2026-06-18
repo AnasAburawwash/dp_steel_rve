@@ -123,6 +123,7 @@ def run_pipeline_for_n(
             damask_executable  = d_cfg.get("executable", "DAMASK_grid"),
             n_threads          = d_cfg.get("n_threads", 4),
             n_workers          = d_cfg.get("n_workers", 1),
+            timeout_s          = d_cfg.get("timeout_s", 3600),
             dry_run            = dry_run,
             retry_failed       = retry_failed,
         )

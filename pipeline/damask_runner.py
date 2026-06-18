@@ -45,6 +45,7 @@ def run_damask_stage(
     damask_executable: str = "DAMASK_grid",
     n_threads:         int = 4,
     n_workers:         int = 1,
+    timeout_s:          int = 3600,
     dry_run:           bool = False,
     retry_failed:      bool = False,
 ) -> dict:
@@ -61,6 +62,7 @@ def run_damask_stage(
     damask_executable: str — name or path of DAMASK_grid binary
     n_threads        : int — OMP_NUM_THREADS per solver call
     n_workers        : int — parallel samples (default 1, see note above)
+    timeout_s        : int — timeout in seconds
     dry_run          : bool
     retry_failed     : bool
 
@@ -104,6 +106,7 @@ def run_damask_stage(
                 rve_size_m         = rve_size_m,
                 damask_executable  = damask_executable,
                 n_threads          = n_threads,
+                timeout_s          = timeout_s,
                 dry_run            = dry_run,
             ): sid
             for sid in pending
@@ -138,6 +141,7 @@ def _damask_worker(
     rve_size_m,
     damask_executable: str,
     n_threads:         int,
+    timeout_s:          int,
     dry_run:           bool,
 ) -> str:
     """Single-sample DAMASK worker (runs in a subprocess)."""
@@ -160,6 +164,7 @@ def _damask_worker(
             sample_dir  = sample_dir,
             executable  = damask_executable,
             n_threads   = n_threads,
+            timeout_s   = timeout_s,
         )
         log.info(
             "DAMASK solve complete  sample_id=%04d  elapsed=%.1fs  return_code=%d",

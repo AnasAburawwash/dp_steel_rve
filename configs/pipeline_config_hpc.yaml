@@ -24,7 +24,7 @@ neper:
   n_grains_ferr: 98
   n_grains_mart: 22
   rve_length_um: 50
-  n_workers:     12             # 8 parallel Neper processes on the node
+  n_workers:     12             # 12 parallel Neper processes on the node
                                 # Each Neper call is single-threaded
                                 # → 8 cores used during Neper stage
   timeout_s:     900            # 15 minutes per Neper call
@@ -60,6 +60,6 @@ hpc:
   scheduler:     lsf
   queue:         BatchXL
   n_cores:       16             # bsub -n
-  time_limit:    "08:00"        # bsub -W  HH:MM
+  time_limit:    "12:00"        # bsub -W  HH:MM
   mem_gb:        32             # bsub -M  in MB below
   job_name:      dp_rve_steel
