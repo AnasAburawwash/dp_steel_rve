@@ -33,6 +33,8 @@ from pathlib import Path
 from pipeline.state_manager   import StateManager
 from utils.logger             import get_logger
 from utils.paths              import ensure_dir
+from utils.hdf5_compress import compress_hdf5
+
 
 log = get_logger(__name__)
 
@@ -172,7 +174,38 @@ def _damask_worker(
             solver_result["elapsed_s"],
             solver_result["return_code"],
         )
+
+        # ── Post-processing: compress output HDF5 ─────────────────
+        hdf5_files = list(sample_dir.glob("*.hdf5"))
+        for hdf5_path in hdf5_files:
+            try:
+                compress_hdf5(
+                    hdf5_path,
+                    method      = "gzip",
+                    level       = 4,
+                    min_size_mb = 50.0,
+                )
+            except Exception as e:
+                # Compression failure is non-fatal: log and continue
+                log.warning(
+                    "HDF5 compression failed for sample %04d (%s): %s",
+                    sample_id, hdf5_path.name, e,
+                )
         return "DONE"
+    
     except Exception:
         log.error("DAMASK FAILED sample %04d:\n%s", sample_id, traceback.format_exc())
+
+        # ── Cleanup: remove partial/corrupt HDF5 on failure ───────
+        orphan_files = list(sample_dir.glob("*.hdf5"))
+        for orphan in orphan_files:
+            try:
+                orphan.unlink()
+                log.warning(
+                    "Removed partial HDF5 for failed sample %04d: %s",
+                    sample_id, orphan.name,
+                )
+            except OSError as e:
+                log.error("Could not remove orphan %s: %s", orphan, e)
+                
         return "FAILED"

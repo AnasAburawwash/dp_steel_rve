@@ -46,6 +46,16 @@ damask:
                                  # → 2 × 4 = 8 cores during DAMASK stage
   timeout_s:     7200            # 1.5 hour per DAMASK call
 
+# ── HDF5 post-processing (yet hardcoded, not configurable) ───────────────────────────────
+  hdf5_postprocess:
+    compress:
+      enabled:       true
+      method:        "gzip"    # gzip | lzf
+      level:         4         # gzip level 1-9 (4 = good balance)
+      min_size_mb:   500.0     # skip compression for small files
+    cleanup_on_failure:
+      remove_hdf5:   true      # delete partial HDF5 if DAMASK fails
+
 # ── Core budget check (informational) ──────────────────────────────────────
 # Neper  stage: n_workers        =  8  cores
 # DAMASK stage: n_workers × n_threads = 2 × 4 = 8  cores
