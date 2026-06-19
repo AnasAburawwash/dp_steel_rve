@@ -42,6 +42,8 @@ def run_pipeline_for_n(
     dry_run:           bool = False,
     retry_failed:      bool = False,
     force_regen:       bool = False,
+    batch_index:  int  | None = None,   # 1-based LSF array index
+    batch_size:   int         = 50,     # samples per job array task
 ) -> None:
     """
     Run the full pipeline (or a single stage) for one dataset size.
@@ -58,6 +60,8 @@ def run_pipeline_for_n(
     dry_run      : bool
     retry_failed : bool
     force_regen  : bool — regenerate LHS dataset even if file exists
+    batch_index  : int | None — 1-based LSF array index
+    batch_size   : int — samples per job array task
     """
     dataset_dir = Path(base_dir) / f"N_{n_samples}"
     dataset_dir.mkdir(parents=True, exist_ok=True)
@@ -77,8 +81,27 @@ def run_pipeline_for_n(
     )
     assert len(dataset) == n_samples, f"Dataset length mismatch: {len(dataset)} != {n_samples}"
 
+    # ── Batch slice (job-array mode) ───────────────────────────────────────
+    if batch_index is not None:
+        idx_start = (batch_index - 1) * batch_size          # 0-based start
+        idx_end   = min(idx_start + batch_size, n_samples)  # exclusive end
+        if idx_start >= n_samples:
+            log.warning(
+                "Batch index %d is out of range for N=%d (batch_size=%d). Nothing to do.",
+                batch_index, n_samples, batch_size,
+            )
+            return
+        dataset = dataset.iloc[idx_start:idx_end]
+        log.info(
+            "Batch mode: index=%d  samples %d–%d  (%d samples)",
+            batch_index, idx_start, idx_end - 1, len(dataset),
+        )
+
     # ── 2. State ───────────────────────────────────────────────────────────
     state = StateManager(dataset_dir, n_samples)
+    # StateManager is always initialised for the FULL N.
+    # This ensures all tasks share one checkpoint file per dataset folder,
+    # and sample IDs in the state match the global 0..N-1 indexing.
 
     # ── 3. Neper stage ─────────────────────────────────────────────────────
     if stage in ("all", "neper"):

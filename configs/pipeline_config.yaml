@@ -46,14 +46,3 @@ damask:
 # ── Logging ───────────────────────────────────────────────────────────────
 logging:
   level: INFO               # DEBUG | INFO | WARNING | ERROR
-
-# ── HPC (stub — fill in when cluster access is available) ─────────────────
-# hpc:
-#   scheduler:     slurm       # slurm | pbs
-#   partition:     compute
-#   account:       myproject
-#   time_limit:    "02:00:00"
-#   nodes:         1
-#   cpus_per_task: 8
-#   mem_gb:        32
-#   modules:       ["neper/4.10", "damask/3.0.0", "anaconda3"]

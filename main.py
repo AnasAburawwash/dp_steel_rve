@@ -61,6 +61,11 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--log-level",    default=None,
                    choices=["DEBUG", "INFO", "WARNING", "ERROR"],
                    help="Override log level from config")
+    p.add_argument("--batch-index", type=int, default=None,
+               help="LSF job array index (1-based, from $LSB_JOBINDEX). "
+                    "If set, only process samples in this batch.")
+    p.add_argument("--batch-size",  type=int, default=50,
+               help="Number of samples per array task (default: 50).")
     return p.parse_args()
 
 
@@ -137,6 +142,8 @@ def main() -> None:
                 dry_run      = args.dry_run,
                 retry_failed = args.retry_failed,
                 force_regen  = args.force_regen,
+                batch_index  = args.batch_index,
+                batch_size   = args.batch_size,
             )
         except KeyboardInterrupt:
             log.warning("Interrupted by user. Progress saved in checkpoint files.")
