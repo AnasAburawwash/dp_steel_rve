@@ -44,7 +44,7 @@ damask:
   n_threads:     4               # OMP_NUM_THREADS per DAMASK_grid call
   n_workers:     4               # 2 concurrent DAMASK solver processes
                                  # → 2 × 4 = 8 cores during DAMASK stage
-  timeout_s:     5400            # 1.5 hour per DAMASK call
+  timeout_s:     7200            # 1.5 hour per DAMASK call
 
 # ── Core budget check (informational) ──────────────────────────────────────
 # Neper  stage: n_workers        =  8  cores
