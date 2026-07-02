@@ -47,6 +47,7 @@ def run_neper_stage(
     n_workers:       int  = 4,
     dry_run:         bool = False,
     retry_failed:    bool = False,
+    batch_ids:    set | None = None,
 ) -> dict:
     """
     Run Neper tessellation for all samples in a dataset.
@@ -58,6 +59,7 @@ def run_neper_stage(
     tess_cfg     : TessellationConfig
     vis_cfg      : VisualizationConfig
     state        : StateManager  — shared checkpoint
+    batch_ids    : set | None    — subset of sample IDs to process
     n_workers    : int           — parallel Neper processes
     dry_run      : bool          — build commands but do not execute
     retry_failed : bool          — reset FAILED → PENDING before running
@@ -73,6 +75,10 @@ def run_neper_stage(
         log.info("Retry mode: reset %d FAILED → PENDING (neper)", n_reset)
 
     sample_ids = state.pending_ids("neper")
+    # Restrict to this batch's IDs only
+    if batch_ids is not None:
+        sample_ids = [sid for sid in sample_ids if sid in batch_ids]
+
     log.info("Neper stage: %d samples pending  (workers=%d  dry_run=%s)",
              len(sample_ids), n_workers, dry_run)
 
@@ -89,7 +95,7 @@ def run_neper_stage(
             pool.submit(
                 _neper_worker,
                 sample_id  = sid,
-                sample_row = dataset.iloc[sid],
+                sample_row = dataset.loc[sid],
                 dataset_dir= dataset_dir,
                 tess_cfg   = tess_cfg,
                 vis_cfg    = vis_cfg,

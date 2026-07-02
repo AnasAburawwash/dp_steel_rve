@@ -50,6 +50,8 @@ def run_damask_stage(
     timeout_s:          int = 3600,
     dry_run:           bool = False,
     retry_failed:      bool = False,
+    batch_ids:    set | None = None,
+
 ) -> dict:
     """
     Run DAMASK grid solver for all Neper-complete samples.
@@ -67,6 +69,7 @@ def run_damask_stage(
     timeout_s        : int — timeout in seconds
     dry_run          : bool
     retry_failed     : bool
+    batch_ids        : set | None — subset of sample IDs to process
 
     Returns
     -------
@@ -87,6 +90,10 @@ def run_damask_stage(
     if neper_not_ready:
         log.warning("%d samples skipped: neper not yet DONE", neper_not_ready)
 
+    # Restrict to this batch's IDs only
+    if batch_ids is not None:
+        pending = [sid for sid in pending if sid in batch_ids]
+
     log.info("DAMASK stage: %d samples pending  (workers=%d  threads=%d  dry_run=%s)",
              len(pending), n_workers, n_threads, dry_run)
 
@@ -103,7 +110,7 @@ def run_damask_stage(
             pool.submit(
                 _damask_worker,
                 sample_id          = sid,
-                sample_row         = dataset.iloc[sid],
+                sample_row         = dataset.loc[sid],
                 dataset_dir        = dataset_dir,
                 rve_size_m         = rve_size_m,
                 damask_executable  = damask_executable,
@@ -183,7 +190,7 @@ def _damask_worker(
                     hdf5_path,
                     method      = "gzip",
                     level       = 4,
-                    min_size_mb = 50.0,
+                    min_size_mb = 500.0,
                 )
             except Exception as e:
                 # Compression failure is non-fatal: log and continue

@@ -85,17 +85,23 @@ def run_pipeline_for_n(
     if batch_index is not None:
         idx_start = (batch_index - 1) * batch_size          # 0-based start
         idx_end   = min(idx_start + batch_size, n_samples)  # exclusive end
+
         if idx_start >= n_samples:
             log.warning(
                 "Batch index %d is out of range for N=%d (batch_size=%d). Nothing to do.",
                 batch_index, n_samples, batch_size,
             )
             return
-        dataset = dataset.iloc[idx_start:idx_end]
+
+        dataset   = dataset.iloc[idx_start:idx_end]         # preserves original index labels
+        batch_ids = set(dataset.index.tolist())              # e.g. {0,1} or {2,3}
+
         log.info(
             "Batch mode: index=%d  samples %d–%d  (%d samples)",
             batch_index, idx_start, idx_end - 1, len(dataset),
         )
+    else:
+        batch_ids = None    # no filter — run all samples (local / single-job mode)
 
     # ── 2. State ───────────────────────────────────────────────────────────
     state = StateManager(dataset_dir, n_samples)
@@ -132,6 +138,7 @@ def run_pipeline_for_n(
             n_workers    = cfg.get("neper", {}).get("n_workers", 4),
             dry_run      = dry_run,
             retry_failed = retry_failed,
+            batch_ids    = batch_ids,
         )
 
     # ── 4. DAMASK stage ────────────────────────────────────────────────────
@@ -149,4 +156,5 @@ def run_pipeline_for_n(
             timeout_s          = d_cfg.get("timeout_s", 3600),
             dry_run            = dry_run,
             retry_failed       = retry_failed,
+            batch_ids    = batch_ids,
         )
