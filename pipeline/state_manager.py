@@ -63,10 +63,14 @@ class StateManager:
         Path to the checkpoint file. If None, uses the default location.
     """
 
-    def __init__(self, dataset_dir: str | Path, n_samples: int, state_path: str | Path | None = None):
+    def __init__(
+        self,
+        dataset_dir: str | Path, n_samples: int,
+        state_path: str | Path | None = None, sample_ids: list[int] | None = None,):
         self.dataset_dir = Path(dataset_dir)
         self.n_samples   = int(n_samples)
-        self._path = Path(state_path) if state_path is not None else self.dataset_dir / CHECKPOINT_FILENAME
+        self.sample_ids = list(sample_ids) if sample_ids is not None else list(range(n_samples))
+        self._path       = Path(state_path) if state_path is not None else self.dataset_dir / CHECKPOINT_FILENAME
         self._lock       = Lock()
         self._state      = self._load_or_init()
 
@@ -173,13 +177,13 @@ class StateManager:
 
         data = {
             "meta": {
-                "n_samples": self.n_samples,
-                "created":   _now(),
-                "version":   _VERSION,
+                "n_samples": len(self.sample_ids),
+                "created": _now(),
+                "version": _VERSION,
             },
             "samples": {
                 str(i): {**_DEFAULT, "updated": _now()}
-                for i in range(self.n_samples)
+                for i in self.sample_ids
             },
         }
         self._state = data

@@ -109,7 +109,9 @@ def run_pipeline_for_n(
         batch_ids = None    # no filter — run all samples (local / single-job mode)
 
     # ── 2. State ───────────────────────────────────────────────────────────
-    state = state = StateManager(dataset_dir, n_samples, state_path=state_path)
+    batch_ids = list(dataset.index.tolist())
+
+    state = StateManager(dataset_dir, n_samples, state_path=state_path, sample_ids=batch_ids)
     # StateManager is initialised per batch in array mode,
     # otherwise it uses one checkpoint per dataset folder.
     # Sample IDs remain global 0..N-1, but each task writes its own state file.
