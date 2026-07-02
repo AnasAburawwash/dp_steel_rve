@@ -59,12 +59,14 @@ class StateManager:
         The N_<n> folder (e.g. E:/PhD/cp_projects/N_500).
     n_samples : int
         Total number of samples in this dataset.
+    state_path : str | Path | None
+        Path to the checkpoint file. If None, uses the default location.
     """
 
-    def __init__(self, dataset_dir: str | Path, n_samples: int):
+    def __init__(self, dataset_dir: str | Path, n_samples: int, state_path: str | Path | None = None):
         self.dataset_dir = Path(dataset_dir)
         self.n_samples   = int(n_samples)
-        self._path       = self.dataset_dir / CHECKPOINT_FILENAME
+        self._path = Path(state_path) if state_path is not None else self.dataset_dir / CHECKPOINT_FILENAME
         self._lock       = Lock()
         self._state      = self._load_or_init()
 

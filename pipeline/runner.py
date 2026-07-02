@@ -66,6 +66,11 @@ def run_pipeline_for_n(
     dataset_dir = Path(base_dir) / f"N_{n_samples}"
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
+    if batch_index is not None:
+        state_path = dataset_dir / f"pipeline_state_batch_{batch_index:03d}.json"
+    else:
+        state_path = dataset_dir / "pipeline_state.json"
+
     log.info("=" * 60)
     log.info("Pipeline  N=%d  stage=%s  dry_run=%s", n_samples, stage, dry_run)
     log.info("=" * 60)
@@ -104,10 +109,10 @@ def run_pipeline_for_n(
         batch_ids = None    # no filter — run all samples (local / single-job mode)
 
     # ── 2. State ───────────────────────────────────────────────────────────
-    state = StateManager(dataset_dir, n_samples)
-    # StateManager is always initialised for the FULL N.
-    # This ensures all tasks share one checkpoint file per dataset folder,
-    # and sample IDs in the state match the global 0..N-1 indexing.
+    state = state = StateManager(dataset_dir, n_samples, state_path=state_path)
+    # StateManager is initialised per batch in array mode,
+    # otherwise it uses one checkpoint per dataset folder.
+    # Sample IDs remain global 0..N-1, but each task writes its own state file.
 
     # ── 3. Neper stage ─────────────────────────────────────────────────────
     if stage in ("all", "neper"):
