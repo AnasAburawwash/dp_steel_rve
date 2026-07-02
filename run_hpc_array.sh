@@ -14,7 +14,7 @@
 # ============================================================
 
 #BSUB -q BatchXL
-#BSUB -J "dp_rve_array[1-20]%20"   # 20 tasks, all can run concurrently
+#BSUB -J dp_rve_array[1-20]%20      # 20 tasks, all can run concurrently
 #BSUB -n 16                         # 16 cores per task
 #BSUB -R "span[hosts=1]"            # CRITICAL: all 16 cores on ONE node
 #BSUB -R "select[cores>=16]"        # only allocate nodes with ≥16 physical cores
@@ -23,7 +23,10 @@
 #BSUB -o logs/array_%J_%I.out       # %J=jobid  %I=array index
 #BSUB -e logs/array_%J_%I.err
 
+
 set -euo pipefail
+ulimit -s unlimited
+
 
 # ── Paths & environment ──────────────────────────────────────
 export LD_LIBRARY_PATH="$HOME/local/gcc-13.2.0/lib64:$HOME/local/gcc-13.2.0/lib:\
@@ -54,7 +57,6 @@ export OMP_STACKSIZE=512M           # DAMASK uses deep OpenMP call stacks
 # ── HDF5 / FFTW tuning ───────────────────────────────────────
 export HDF5_USE_FILE_LOCKING=TRUE   # safe for single-node; FALSE only on Lustre
 export FFTW_WISDOM_DIR="$HOME/.fftw_wisdom"   # reuse FFTW plan cache across tasks
-mkdir -p "$FFTW_WISDOM_DIR"
 
 # ── Python / process tuning ──────────────────────────────────
 export PYTHONFAULTHANDLER=1         # dump traceback on segfault (debug aid)
@@ -65,7 +67,10 @@ export MALLOC_TRIM_THRESHOLD_=0     # return freed memory to OS promptly
 
 PIPELINE_DIR="/home/toso3816/src/dp_steel_rve"
 cd "${PIPELINE_DIR}"
-mkdir -p logs
+mkdir -p logs "${FFTW_WISDOM_DIR}"
+
+
+
 
 # ── Task info ────────────────────────────────────────────────
 echo "=== ARRAY TASK INFO ==="
